@@ -1,25 +1,32 @@
 from django.core.exceptions import ValidationError
 from django.forms import ModelChoiceField, ModelForm  # import forms
 from django.contrib import admin
+from django.utils.safestring import mark_safe  # for highlight an exceptions in class NoteBookAdminForm
 from .models import *   # import all models here
-
 from PIL import Image
 
 
-class NoteBookAdminForm(ModelForm):  # requirements for download images upper then 400 px
+class NoteBookAdminForm(ModelForm):  # requirements for download images upper then 400 px and lower then 900 px
 
     MIN_RESOLUTIONS = (400, 400)
+    MAX_RESOLUTIONS = (900, 900)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['image'].help_text = 'Загружайте изображения {}x{}'.format(*self.MIN_RESOLUTIONS)
+        self.fields['image'].help_text = mark_safe(  # mark_safe transfer python format to css and change color
+            '<span style = "color:red">Загружайте изображения min {}x{}</span>'.format(*self.MIN_RESOLUTIONS),
+            # '<span style = "color:red">Загружайте изображения max {}x{}</span>'.format(*self.MAX_RESOLUTIONS)
+        )
 
     def clean_image(self):
         image = self.cleaned_data['image']
         img = Image.open(image)
         min_height, min_width = self.MIN_RESOLUTIONS
+        max_height, max_width = self.MAX_RESOLUTIONS
         if img.height < min_height or img.width < min_width:
             raise ValidationError('Разрешение изображения меньше минимального')
+        if img.height > max_height or img.width > max_width:
+            raise ValidationError('Разрешение изображения больше максимального')
         return image
 
 
