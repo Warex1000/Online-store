@@ -23,7 +23,11 @@ urlpatterns = [
     path('', include('mainapp.urls')),   # Запуск проекта в браузере
 ]
 
-if settings.DEBUG:   # Если сервер находиться в режиме DEBUG используем локальный медиа контент который записывается в корень проекта и не находиться на сервере
+if settings.DEBUG:
+    '''
+    # Если сервер находиться в режиме DEBUG используем локальный медиа контент который записывается в корень проекта 
+    и не находиться на сервере
+    '''
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
