@@ -103,15 +103,19 @@ class Product(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):  # requirements for save images upper then 400px and lower then 900px for Shell
+        # image = self.image
+        # img = Image.open(image)
+        # min_height, min_width = self.MIN_RESOLUTIONS
+        # max_height, max_width = self.MAX_RESOLUTIONS
+        # if img.height < min_height or img.width < min_width:
+        #     raise MinResolutionErrorException('Разрешение изображения меньше минимального')
+        # if img.height > max_height or img.width > max_width:
+        #     raise MaxResolutionErrorException('Разрешение изображения больше максимального')
         image = self.image
         img = Image.open(image)
-        min_height, min_width = self.MIN_RESOLUTIONS
-        max_height, max_width = self.MAX_RESOLUTIONS
-        if img.height < min_height or img.width < min_width:
-            raise MinResolutionErrorException('Разрешение изображения меньше минимального')
-        if img.height > max_height or img.width > max_width:
-            raise MaxResolutionErrorException('Разрешение изображения больше максимального')
-        return image
+        new_img = img.convert('RGB')
+        resized_new_img = new_img.resize((200, 200), Image.ANTIALIAS)
+        super().save(*args, **kwargs)
 
 
 class Notebook(Product):

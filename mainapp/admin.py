@@ -11,25 +11,23 @@ class NoteBookAdminForm(ModelForm):  # requirements for save images upper then 4
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['image'].help_text = mark_safe(  # mark_safe transfer python format to css and change color
-            '<span style="'
-            'color:red; '
-            'font-size:14px;'
-            '">Загружайте изображения min {}x{}</span>'.format(*Product.MIN_RESOLUTIONS)
-            # '<span style = "color:red">Загружайте изображения max {}x{}</span>'.format(*self.MAX_RESOLUTIONS)
+            """<span style="color:red; font-size:14px;">
+            При загрузке изображения с разрешением больше {}x{} оно будет обрезано!
+            </span>""".format(*Product.MAX_RESOLUTIONS)
         )
 
-    def clean_image(self):
-        image = self.cleaned_data['image']
-        img = Image.open(image)
-        min_height, min_width = Product.MIN_RESOLUTIONS
-        max_height, max_width = Product.MAX_RESOLUTIONS
-        if image.size > Product.MAX_IMAGE_SIZE:
-            raise ValidationError('Размер изображения не должен привышать 3MB')
-        if img.height < min_height or img.width < min_width:
-            raise ValidationError('Разрешение изображения меньше минимального')
-        if img.height > max_height or img.width > max_width:
-            raise ValidationError('Разрешение изображения больше максимального')
-        return image
+    # def clean_image(self):
+    #     image = self.cleaned_data['image']
+    #     img = Image.open(image)
+    #     min_height, min_width = Product.MIN_RESOLUTIONS
+    #     max_height, max_width = Product.MAX_RESOLUTIONS
+    #     if image.size > Product.MAX_IMAGE_SIZE:
+    #         raise ValidationError('Размер изображения не должен привышать 3MB')
+    #     if img.height < min_height or img.width < min_width:
+    #         raise ValidationError('Разрешение изображения меньше минимального')
+    #     if img.height > max_height or img.width > max_width:
+    #         raise ValidationError('Разрешение изображения больше максимального')
+    #     return image
 
 
 class NotebookAdmin(admin.ModelAdmin):
