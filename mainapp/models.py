@@ -1,3 +1,4 @@
+from PIL import Image
 from django.db import models
 from django.contrib.auth import get_user_model  # v.1 Используем юзера, который указан в настройках
 from django.contrib.contenttypes.models import ContentType
@@ -22,6 +23,14 @@ User = get_user_model()  # v.1.1 Используем юзера, который
 ContentType Микрофрейм ворк который видет модели которые есть в INSTALLED_APPS в settings предоставляя 
 универсальный интерфейс
 """
+
+
+class MinResolutionErrorException(Exception):
+    pass
+
+
+class MaxResolutionErrorException(Exception):
+    pass
 
 
 class LatestProductsManager:  # 1:13:00 Просмотреть суть этого класса с моделями.
@@ -66,6 +75,11 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+
+    MIN_RESOLUTIONS = (400, 400)
+    MAX_RESOLUTIONS = (900, 900)
+    MAX_IMAGE_SIZE = 3145728  # ~ 3mb
+
     class Meta:
         abstract = True
 
@@ -87,6 +101,17 @@ class Product(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):  # requirements for save images upper then 400px and lower then 900px for Shell
+        image = self.image
+        img = Image.open(image)
+        min_height, min_width = self.MIN_RESOLUTIONS
+        max_height, max_width = self.MAX_RESOLUTIONS
+        if img.height < min_height or img.width < min_width:
+            raise MinResolutionErrorException('Разрешение изображения меньше минимального')
+        if img.height > max_height or img.width > max_width:
+            raise MaxResolutionErrorException('Разрешение изображения больше максимального')
+        return image
 
 
 class Notebook(Product):
