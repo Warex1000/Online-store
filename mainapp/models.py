@@ -1,8 +1,13 @@
 from PIL import Image
+import sys   # modul of size
+
 from django.db import models
 from django.contrib.auth import get_user_model  # v.1 Используем юзера, который указан в настройках
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile   # for resize download images
+
 
 User = get_user_model()  # v.1.1 Используем юзера, который указан в скрытых настройках (settings.AUTH_USER_MODEL)
 
@@ -111,10 +116,18 @@ class Product(models.Model):
         #     raise MinResolutionErrorException('Разрешение изображения меньше минимального')
         # if img.height > max_height or img.width > max_width:
         #     raise MaxResolutionErrorException('Разрешение изображения больше максимального')
+        # cut the images
         image = self.image
         img = Image.open(image)
         new_img = img.convert('RGB')
         resized_new_img = new_img.resize((200, 200), Image.ANTIALIAS)
+        filestream = BytesIO()
+        resized_new_img.save(filestream, 'JPEG', quality=90)
+        filestream.seek(0)
+        name = '{}.{}'.format(*self.image.name.split('.'))
+        self.image = InMemoryUploadedFile(
+            filestream, 'ImageField', name, 'jpeg/image', sys.getsizeof(filestream), None
+        )
         super().save(*args, **kwargs)
 
 
