@@ -1,29 +1,24 @@
-from PIL import Image
-import sys   # modul of size
+from PIL import Image   # for work with images
+import sys   # module of size images
 
 from django.db import models
 from django.contrib.auth import get_user_model  # v.1 Используем юзера, который указан в настройках
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from io import BytesIO
+from io import BytesIO   # for work with images
 from django.core.files.uploadedfile import InMemoryUploadedFile   # for resize download images
+from django.urls import reverse   # make url for object product
 
 
 User = get_user_model()  # v.1.1 Используем юзера, который указан в скрытых настройках (settings.AUTH_USER_MODEL)
 
-# ***************
-# Создаем модели для интернет-магазина
-# 1 Category
-# 2 Product
-# 3 CartProduct
-# 4 Cart
-# 5 Order
-# 6 Customer
-# 7 Spesification
-# ***************
+def get_product_url(obj, viewename):
+    ct_model = obj.__class__._meta.model.name
+    return reverse(viewename, kwargs={'ct_model': ct_model, 'slug': obj.slug})
+
 
 """
-# Представление которое будет отвечать за стартовую страницу будет имитировать 1 запрос и доставать вест список
+Представление которое будет отвечать за стартовую страницу будет имитировать 1 запрос и доставать вест список
 товаров которое мы хотим отобразить на главной странице class LatestProductsManager
 ContentType Микрофрейм ворк который видет модели которые есть в INSTALLED_APPS в settings предоставляя 
 универсальный интерфейс
@@ -107,16 +102,20 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):  # requirements for save images upper then 400px and lower then 900px for Shell
-        # image = self.image
-        # img = Image.open(image)
-        # min_height, min_width = self.MIN_RESOLUTIONS
-        # max_height, max_width = self.MAX_RESOLUTIONS
-        # if img.height < min_height or img.width < min_width:
-        #     raise MinResolutionErrorException('Разрешение изображения меньше минимального')
-        # if img.height > max_height or img.width > max_width:
-        #     raise MaxResolutionErrorException('Разрешение изображения больше максимального')
-        # cut the images
+
+'''
+    def save(self, *args, **kwargs):
+        # 1. Example for save images upper then 400px and lower then 900px
+        image = self.image
+        img = Image.open(image)
+        min_height, min_width = self.MIN_RESOLUTIONS
+        max_height, max_width = self.MAX_RESOLUTIONS
+        if img.height < min_height or img.width < min_width:
+            raise MinResolutionErrorException('Разрешение изображения меньше минимального')
+        if img.height > max_height or img.width > max_width:
+            raise MaxResolutionErrorException('Разрешение изображения больше максимального')
+
+        # 2. Example cut the images to 200px x 200px
         image = self.image
         img = Image.open(image)
         new_img = img.convert('RGB')
@@ -129,6 +128,7 @@ class Product(models.Model):
             filestream, 'ImageField', name, 'jpeg/image', sys.getsizeof(filestream), None
         )
         super().save(*args, **kwargs)
+'''
 
 
 class Notebook(Product):
@@ -141,6 +141,9 @@ class Notebook(Product):
 
     def __str__(self):
         return "{} : {}".format(self.category.name, self.title)   # {Категория} : {Какой товар}
+
+    def get_absolute_url(self):   # for url view
+        return get_product_url(self, 'product_detail')
 
 
 class Smartphone(Product):
@@ -156,6 +159,9 @@ class Smartphone(Product):
 
     def __str__(self):
         return "{} : {}".format(self.category.name, self.title)
+
+    def get_absolute_url(self):   # for url view
+        return get_product_url(self, 'product_detail')
 
 
 class CartProduct(models.Model):

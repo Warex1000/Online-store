@@ -5,9 +5,10 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe  # for highlight an exceptions in class NoteBookAdminForm
 from .models import *   # import all models here
 
-
+'''
+Example cut the images to 200 px x 200 px
 class NoteBookAdminForm(ModelForm):  # requirements for save images upper then 400px/lower 900px/lower 3MB for Form
-
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['image'].help_text = mark_safe(  # mark_safe transfer python format to css and change color
@@ -16,23 +17,24 @@ class NoteBookAdminForm(ModelForm):  # requirements for save images upper then 4
             </span>""".format(*Product.MAX_RESOLUTIONS)
         )
 
-    # def clean_image(self):
-    #     image = self.cleaned_data['image']
-    #     img = Image.open(image)
-    #     min_height, min_width = Product.MIN_RESOLUTIONS
-    #     max_height, max_width = Product.MAX_RESOLUTIONS
-    #     if image.size > Product.MAX_IMAGE_SIZE:
-    #         raise ValidationError('Размер изображения не должен привышать 3MB')
-    #     if img.height < min_height or img.width < min_width:
-    #         raise ValidationError('Разрешение изображения меньше минимального')
-    #     if img.height > max_height or img.width > max_width:
-    #         raise ValidationError('Разрешение изображения больше максимального')
-    #     return image
+    def clean_image(self):
+        image = self.cleaned_data['image']
+        img = Image.open(image)
+        min_height, min_width = Product.MIN_RESOLUTIONS
+        max_height, max_width = Product.MAX_RESOLUTIONS
+        if image.size > Product.MAX_IMAGE_SIZE:
+            raise ValidationError('Размер изображения не должен привышать 3MB')
+        if img.height < min_height or img.width < min_width:
+            raise ValidationError('Разрешение изображения меньше минимального')
+        if img.height > max_height or img.width > max_width:
+            raise ValidationError('Разрешение изображения больше максимального')
+        return image
+'''
 
 
 class NotebookAdmin(admin.ModelAdmin):
 
-    form = NoteBookAdminForm
+    # form = NoteBookAdminForm   # For work with image save
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == 'category':
