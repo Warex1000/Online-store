@@ -1,5 +1,5 @@
 {%  extends 'base.html' %}
-
+{% load specifications %}
 {% block content %}
     <nav aria-label="breadcrumb" class="mt-3">{# bootstrap indent mt-3 #}
       <ol class="breadcrumb">
@@ -18,10 +18,15 @@
             <p> Описание: {{ product.description }}</p>
         </div>
             <p class="mt-4"> Характеристики: </p>
+
+            {# first filter using notebook_specifications.html and smartphone_specifications.html #}
             {% if product.category.slug == 'notebooks' %}{# chack if category notebooks or another #}
                 {% include 'notebook_specifications.html' %}{# include templates notebook_specifications.html #}
             {% else %}
                 {% include 'smartphone_specifications.html' %}{# include templates smartphone_specifications.html #}
             {% endif %}
+
+            {{ product|product_spec }}
+            {# for example add another filter number2, create templatetags and specifications.py#}
     </div>
 {% endblock content %}
