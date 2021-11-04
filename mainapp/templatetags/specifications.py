@@ -1,7 +1,9 @@
 from django import template
 from django.utils.safestring import mark_safe
-# for read text as a html code
 
+from mainapp.models import Smartphone  # for check box sd
+
+# for read text as a html code
 register = template.Library()  # add template to library
 
 
@@ -58,4 +60,9 @@ def get_product_spec(product, model_name):
 @register.filter   # Create filter
 def product_spec(product):
     model_name = product.__class__._meta.model_name
+    if isinstance(product, Smartphone):  # for check box sd
+        if not product.sd:  # for check box sd
+            PRODUCT_SPEC['smartphone'].pop('Максимальный обем встроеной памяти')  # for check box sd
+        else:
+            PRODUCT_SPEC['smartphone']['Максимальный обем встроеной памяти'] = 'sd_volume_max'  # for check box sd
     return mark_safe(TABLE_HEAD + get_product_spec(product, model_name) + TABLE_TAIL)

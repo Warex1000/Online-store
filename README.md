@@ -19,4 +19,4 @@ What me do:
 - register models in admin
 
 
-# 3:07:17
+# 3:45:05
