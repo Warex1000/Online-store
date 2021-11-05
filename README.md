@@ -18,5 +18,8 @@ What me do:
 - make: makemigrations and migrate
 - register models in admin
 
+Monday in 11^00 meeting call, right list Telegram HR
+Salary upper then 500$ after start 5 days
+work with tracker 
 
-# 3:45:05
+# 3:59:00

@@ -12,6 +12,11 @@ from django.urls import reverse   # make url for object product
 
 User = get_user_model()  # v.1.1 Используем юзера, который указан в скрытых настройках (settings.AUTH_USER_MODEL)
 
+
+def get_models_for_count(*model_names):
+    return [models.Count(model_name) for model_name in model_names]
+
+
 def get_product_url(obj, viewename):
     ct_model = obj.__class__._meta.model.name
     return reverse(viewename, kwargs={'ct_model': ct_model, 'slug': obj.slug})
@@ -59,10 +64,27 @@ class LatestProducts:
     objects = LatestProductsManager()
 
 
+class CategoryManager(models.Manager):  # In site pages for side bar see the product category and Quantity
+
+    CATEGORY_NAME_COUNT_NAME = {
+        'Ноутбуки': 'notebook__count',
+        'Смартфоны': 'smartphone__count'
+    }
+
+    def get_queryset(self):
+        return super().get_queryset()
+
+    def get_categories_for_left_sidebar(self):
+        models = get_models_for_count('notebook', 'smartphone')
+        qs = list(self.get_queryset().annotate(*models).values())
+        return [dict(name=c['name'], slug=c['slug'], count=c[self.CATEGORY_NAME_COUNT_NAME[c['name']]]) for c in qs]
+
+
 class Category(models.Model):
     name = models.CharField(max_length=255, verbose_name='Имя категории')
     slug = models.SlugField(
         unique=True)
+    objects = CategoryManager()
     ''' 
     короткое название-метка, содержит только буквы числа нижнее подчеркивание дефис. 
     Используются в URL(Category/nootebook)
