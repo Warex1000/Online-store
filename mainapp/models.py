@@ -85,6 +85,7 @@ class CategoryManager(models.Manager):  # In site pages for side bar see the pro
 
 
 class Category(models.Model):
+    parents_category = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, verbose_name='Имя категории')
     slug = models.SlugField(
         unique=True)
