@@ -8,6 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from io import BytesIO   # for work with images
 from django.core.files.uploadedfile import InMemoryUploadedFile   # for resize download images
 from django.urls import reverse   # make url for object product
+from django.utils.translation import gettext_lazy
 
 
 User = get_user_model()  # v.1.1 Используем юзера, который указан в скрытых настройках (settings.AUTH_USER_MODEL)
@@ -96,8 +97,12 @@ class Category(models.Model):
     prepopulated_fields = {"slug": (
     "title",)}  # позволяет определить поля, которые получают значение основываясь на значениях других полей
 
+    class Meta:
+        verbose_name = gettext_lazy('category')
+        verbose_name_plural = gettext_lazy('categories')
+
     def __str__(self):  # отображение категории в админке
-        return self.name
+        return self.name   # f'{self.name} | parent - {self.parents_category}' if self.parent else self.name  # Показывает вложенные категории в админке
 
     def get_absolute_url(self):
         return reverse('category_detail', kwargs={'slug': self.slug})
