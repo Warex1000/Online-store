@@ -18,4 +18,4 @@ What me do:
 - make: makemigrations and migrate
 - register models in admin
 
-# (у20)
+# (у22) 5 : 00 

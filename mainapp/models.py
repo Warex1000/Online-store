@@ -44,8 +44,7 @@ class LatestProductsManager:  # 1:13:00 Просмотреть суть этог
     def get_products_for_main_page(*args, **kwargs):
         with_respect_to = kwargs.get('with_respect_to')  # Отображение определенных товаров первыми в списке
         products = []  # Финальный список товаров
-        ct_models = ContentType.objects.filter(
-            model__in=args)  # Запрос ContentType фильтруя модели которые находятся в аргументах args
+        ct_models = ContentType.objects.filter(model__in=args)  # Запрос ContentType фильтруя модели которые находятся в аргументах args
         for ct_model in ct_models:
             model_products = ct_model.model_class()._base_manager.all().order_by('-id')[:5]
             products.extend(model_products)
@@ -54,9 +53,8 @@ class LatestProductsManager:  # 1:13:00 Просмотреть суть этог
             if ct_model.exists():
                 if with_respect_to in args:
                     return sorted(
-                        products,
-                        key=lambda x: x.__class__._meta.model_name.strtswith(with_respect_to),
-                        reverse=True)
+                        products, key=lambda x: x.__class__._meta.model_name.startswith(with_respect_to), reverse=True
+                    )
         return products
 
 
@@ -85,7 +83,8 @@ class CategoryManager(models.Manager):  # In site pages for side bar see the pro
 
 
 class Category(models.Model):
-    parents_category = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
+
+    # parents_category = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, verbose_name='Имя категории')
     slug = models.SlugField(
         unique=True)
@@ -162,6 +161,7 @@ class Product(models.Model):
 
 
 class Notebook(Product):
+    name = models.CharField(max_length=255, verbose_name='Имя')
     diagonal = models.CharField(max_length=255, verbose_name='Диагональ')
     display_type = models.CharField(max_length=255, verbose_name='Тип дисплея')
     processor_freq = models.CharField(max_length=255, verbose_name='Частота процессора')
@@ -177,6 +177,7 @@ class Notebook(Product):
 
 
 class Smartphone(Product):
+    name = models.CharField(max_length=255, verbose_name='Имя')
     diagonal = models.CharField(max_length=255, verbose_name='Диагональ')
     display_type = models.CharField(max_length=255, verbose_name='Тип дисплея')
     resolution = models.CharField(max_length=255, verbose_name='Разрешение екрана')

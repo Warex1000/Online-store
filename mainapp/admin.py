@@ -4,7 +4,7 @@ from django.forms import ModelChoiceField, ModelForm, ValidationError  # import 
 from django.contrib import admin
 from django.utils.safestring import mark_safe  # for highlight an exceptions in class NoteBookAdminForm
 from .models import *   # import all models here
-
+from .models import Smartphone
 '''
 Example cut the images to 200 px x 200 px
 class NoteBookAdminForm(ModelForm):  # requirements for save images upper then 400px/lower 900px/lower 3MB for Form
@@ -38,9 +38,9 @@ class SmartphoneAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         instance = kwargs.get('instance')
-        if not instance.sd:
+        if instance and not instance.sd:
             self.fields['sd_volume_max'].widget.attrs.update({
-                'readonly': True, 'style': 'background: lightgray'
+                'readonly': True, 'style': 'background: lightgray;'
             })
 
     def clean(self):
@@ -79,3 +79,5 @@ admin.site.register(Smartphone, SmartphoneAdmin)
 admin.site.register(CartProduct)
 admin.site.register(Cart)
 admin.site.register(Customer)
+
+
